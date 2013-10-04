@@ -26,7 +26,7 @@ if (test)
     add_subdirectory("thirdparty/gtest-1.7.0")
 
     enable_testing()
-
+    
     # Include gtest library
     include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 

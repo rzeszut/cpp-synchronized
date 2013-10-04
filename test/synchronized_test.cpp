@@ -4,22 +4,7 @@
 using namespace __synchronized;
 using namespace std;
 
-class SynchronizedTest : public ::testing::Test {
-protected:
-    virtual void SetUp() {
-    }
-
-    virtual void TearDown() {
-        for (auto &el : __synchronized_map) {
-            if (el.second) {
-                el.second->unlock();
-            }
-        }
-        __synchronized_map.clear();
-    }
-};
-
-TEST_F(SynchronizedTest, ShouldLockValue) {
+TEST(SynchronizedTest, ShouldLockValue) {
     // when
     pair<bool, shared_ptr<mutex>> ret = __lock_value((void *) 42);
 
@@ -27,11 +12,11 @@ TEST_F(SynchronizedTest, ShouldLockValue) {
     ASSERT_TRUE(ret.first);
     ASSERT_TRUE((bool) ret.second);
 
-    auto it = __synchronized_map.find((void *) 42);
-    ASSERT_EQ(it->second, ret.second);
+    // cleanup
+    __release_lock(ret);
 }
 
-TEST_F(SynchronizedTest, ShouldReleaseLock) {
+TEST(SynchronizedTest, ShouldReleaseLock) {
     // given
     pair<bool, shared_ptr<mutex>> lock = __lock_value((void *) 42);
 

@@ -1,12 +1,14 @@
 #include "synchronized/synchronized.hpp"
 
+#include <map>
+
 using namespace std;
 using namespace __synchronized;
 
 namespace __synchronized {
 
-mutex __synchronized_lock;
-map<void *, shared_ptr<mutex>> __synchronized_map;
+static mutex __synchronized_lock;
+static map<void *, shared_ptr<mutex>> __synchronized_map;
 
 pair<bool, shared_ptr<mutex>> __lock_value(void *val) {
     // first, lock the map

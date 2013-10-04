@@ -1,5 +1,5 @@
 #!/bin/bash
-mkdir -p target
-cd target
+mkdir -p build 
+cdbuild 
 cmake .. -Dtest=ON -Dexamples=ON
 make
