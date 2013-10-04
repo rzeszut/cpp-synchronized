@@ -4,6 +4,9 @@ project(cpp-synchronized)
 # Set this to on (-Dtest=ON) to compile tests as well
 option(test "Build all tests." OFF)
 
+# Set this to ON to build examples as well.
+option(examples "Build examples." OFF)
+
 # Basic variables
 SET (MAINFOLDER ${PROJECT_SOURCE_DIR})
 SET (EXECUTABLE_OUTPUT_PATH "${MAINFOLDER}/bin")
@@ -29,4 +32,8 @@ if (test)
 
     # Include library tests
     add_subdirectory(test)
-endif()
+endif ()
+
+if (examples)
+    add_subdirectory(examples)
+endif ()

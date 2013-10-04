@@ -2,6 +2,7 @@
 #include "synchronized/synchronized.hpp"
 
 using namespace __synchronized;
+using namespace std;
 
 class SynchronizedTest : public ::testing::Test {
 protected:
@@ -9,57 +10,35 @@ protected:
     }
 
     virtual void TearDown() {
+        for (auto &el : __synchronized_map) {
+            if (el.second) {
+                el.second->unlock();
+            }
+        }
         __synchronized_map.clear();
     }
 };
 
 TEST_F(SynchronizedTest, ShouldLockValue) {
     // when
-    __lock_value((void *) 42);
+    pair<bool, shared_ptr<mutex>> ret = __lock_value((void *) 42);
 
     // then
-    ASSERT_FALSE(__synchronized_lock.isLocked());
+    ASSERT_TRUE(ret.first);
+    ASSERT_TRUE((bool) ret.second);
 
     auto it = __synchronized_map.find((void *) 42);
-    ASSERT_NE(it, __synchronized_map.end());
-    ASSERT_TRUE((bool) it->second);
-    ASSERT_TRUE(it->second->isLocked());
-}
-
-TEST_F(SynchronizedTest, ShouldReturnTrueWhenLocked) {
-    // given
-    __lock_value((void *) 42);
-    
-    // when
-    bool locked = __is_locked((void *) 42);
-
-    // then
-    ASSERT_FALSE(__synchronized_lock.isLocked());
-    ASSERT_TRUE(locked);
-}
-
-TEST_F(SynchronizedTest, ShouldReturnFalseWhenNotLocked) {
-    // when
-    bool locked = __is_locked((void *) 42);
-
-    // then
-    ASSERT_FALSE(__synchronized_lock.isLocked());
-    ASSERT_FALSE(locked);
+    ASSERT_EQ(it->second, ret.second);
 }
 
 TEST_F(SynchronizedTest, ShouldReleaseLock) {
     // given
-    __lock_value((void *) 42);
+    pair<bool, shared_ptr<mutex>> lock = __lock_value((void *) 42);
 
     // when
-    __release_lock((void *) 42);
+    __release_lock(lock);
 
     // then
-    ASSERT_FALSE(__synchronized_lock.isLocked());
-
-    auto it = __synchronized_map.find((void *) 42);
-    bool locked = it != __synchronized_map.end() 
-        && it->second && it->second->isLocked();
-    ASSERT_FALSE(locked);
+    ASSERT_FALSE(lock.first);
+    ASSERT_FALSE((bool) lock.second);
 }
-
